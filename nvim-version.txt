@@ -1,0 +1,3 @@
+NVIM v0.13.0-dev-1649+gc171a697cb
+Build type: Release
+LuaJIT 2.1.1788460057
