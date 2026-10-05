@@ -23,5 +23,5 @@ require('my.core.pack')
 local load = require('my.utils.load')
 
 load.on_events('FileType', 'my.core.treesitter')
-require('my.core.diagnostic')
+load.on_events('DiagnosticChanged', 'my.core.diagnostic')
 load.on_events('FileType', 'my.core.lsp')

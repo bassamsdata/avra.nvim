@@ -361,3 +361,17 @@ require('my.utils.load').on_cmds(
   'my.load_runtime',
   load_runtime
 )
+
+if vim.fn.has('nvim-0.12') == 1 then
+  require('vim._core.ui2').enable({
+    enable = true,
+    msg = {
+      targets = 'msg',
+      msg = { -- Options related to msg window.
+        height = 0.5, -- Maximum height.
+        -- timeout = 4000, -- Time a message is visible in the message window.
+      },
+    },
+  })
+  vim.opt.cmdheight = 0
+end

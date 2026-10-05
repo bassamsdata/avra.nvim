@@ -69,8 +69,8 @@ vim.api.nvim_create_autocmd('UIEnter', {
         chunks = {
           {
             text = string.format(
-              'Neovim :: %s',
-              vim.go.termguicolors and 'M Λ C R O' or 'M A C R O'
+              '%s.NVIM',
+              vim.go.termguicolors and 'Λ V R Λ' or 'Λ V R Λ'
             ),
             hl = 'Normal',
           },

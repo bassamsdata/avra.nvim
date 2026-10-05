@@ -19,63 +19,9 @@ return {
       vim.cmd.packadd('molten-nvim')
       vim.cmd.UpdateRemotePlugins()
     end,
-    -- No need to lazy load on molten's builtin commands (e.g. `:MoltenInit`)
-    -- since they are already registered in rplugin manifest,
-    -- see `:h $NVIM_RPLUGIN_MANIFEST`
-    -- Below are extra commands defined in `lua/configs/molten.lua`
-    cmds = {
-      'MoltenNotebookRunLine',
-      'MoltenNotebookRunCellAbove',
-      'MoltenNotebookRunCellBelow',
-      'MoltenNotebookRunCellCurrent',
-      'MoltenNotebookRunVisual',
-      'MoltenNotebookRunOperator',
-    },
-    init = function(spec, path)
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = { 'python', 'markdown' },
-        callback = function(args)
-          if
-            vim.bo[args.buf].ft ~= 'python'
-            and vim.fn.fnamemodify(vim.api.nvim_buf_get_name(args.buf), ':e')
-              ~= 'ipynb'
-          then
-            return
-          end
-
-          local utils = require('my.utils')
-
-          utils.load.on_keys(
-            {
-              mode = 'x',
-              lhs = '<CR>',
-              opts = { buffer = args.buf, desc = 'Run selected code' },
-            },
-            'molten',
-            function()
-              utils.pack.load(spec, path)
-            end
-          )
-          if vim.bo[args.buf].ft == 'markdown' then
-            utils.load.on_keys(
-              {
-                -- stylua: ignore start
-                { lhs = '<CR>', opts = { buffer = args.buf, desc = 'Run current cell' } },
-                { lhs = '<LocalLeader>k', opts = { buffer = args.buf, desc = 'Run current cell and all above' } },
-                { lhs = '<LocalLeader>j', opts = { buffer = args.buf, desc = 'Run current cell and all below' } },
-                { lhs = '<LocalLeader><CR>', opts = { buffer = args.buf, desc = 'Run current cell by operator' } },
-                -- stylua: ignore end
-              },
-              'molten',
-              function()
-                utils.pack.load(spec, path)
-              end
-            )
-          end
-          return true
-        end,
-      })
-    end,
+    -- Remote commands are registered independently of packadd. Load Molten's
+    -- Lua helpers and settings with the spec, before any remote command runs.
+    -- The Python host and kernels still start on demand.
     postload = function()
       if pcall(require, 'image') then
         vim.g.molten_image_provider = 'image.nvim'
