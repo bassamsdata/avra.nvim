@@ -9,6 +9,12 @@ local function augroup(group, ...)
   end
 end
 
+require('my.utils.load').on_events('UIEnter', 'my.core.modecolor', function()
+  vim.schedule(function()
+    require('my.core.modecolor').setup()
+  end)
+end)
+
 -- This can only handle cases where the big file exists on disk before opening
 -- it but not big buffers without corresponding files
 -- TODO: Handle big buffers without corresponding files
@@ -593,6 +599,7 @@ end
 
 do
   local json = require('my.utils.json')
+  local startup_ready = false
 
   local colors_config_file =
     vim.fs.joinpath(vim.fn.stdpath('state'), 'colors.json')
@@ -623,6 +630,16 @@ do
   -- itself in tmux
   restore_colorscheme()
 
+  vim.api.nvim_create_autocmd('UIEnter', {
+    once = true,
+    group = vim.api.nvim_create_augroup('my.colorscheme_startup', {}),
+    callback = function()
+      vim.schedule(function()
+        startup_ready = true
+      end)
+    end,
+  })
+
   augroup('my.colorscheme_restore', {
     'UIEnter',
     {
@@ -646,27 +663,31 @@ do
           return
         end
 
+        local sync_external = startup_ready
+        local colors_name = vim.g.colors_name
+        local background = vim.go.bg
+        local termguicolors = vim.go.termguicolors
         vim.schedule(function()
           local colors_config = json.read(colors_config_file)
 
           if
-            colors_config.colors_name == vim.g.colors_name
-            and colors_config.bg == vim.go.bg
+            colors_config.colors_name == colors_name
+            and colors_config.bg == background
           then
             return
           end
 
-          if colors_config.colors_name ~= vim.g.colors_name then
-            colors_config.colors_name = vim.g.colors_name
-            if vim.fn.executable('setcolor') == 1 then
-              vim.system({ 'setcolor', vim.g.colors_name })
+          if colors_config.colors_name ~= colors_name then
+            colors_config.colors_name = colors_name
+            if sync_external and vim.fn.executable('setcolor') == 1 then
+              vim.system({ 'setcolor', colors_name })
             end
           end
 
-          if colors_config.bg ~= vim.go.bg and vim.go.termguicolors then
-            colors_config.bg = vim.go.bg
-            if vim.fn.executable('setbg') == 1 then
-              vim.system({ 'setbg', vim.go.bg })
+          if colors_config.bg ~= background and termguicolors then
+            colors_config.bg = background
+            if sync_external and vim.fn.executable('setbg') == 1 then
+              vim.system({ 'setbg', background })
             end
           end
 

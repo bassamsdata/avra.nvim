@@ -29,6 +29,16 @@ load.on_events(
   end
 )
 
+-- Persistent transparency and terminal theme synchronization
+---@param args? vim.api.keyset.create_autocmd.callback_args
+---@return nil
+local function setup_appearance(args)
+  require('my.plugin.appearance').setup(args and args.event)
+end
+
+load.on_events('UIEnter', 'plugin.appearance', setup_appearance)
+load.on_cmds('Appearance', 'plugin.appearance', setup_appearance)
+
 -- expandtab
 load.on_events('InsertEnter', 'plugin.expandtab', function()
   require('my.plugin.expandtab').setup()

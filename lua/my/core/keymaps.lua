@@ -500,6 +500,10 @@ require('my.utils.load').on_events(
       desc = 'Toggle undotree',
     })
 
+    map('n', '<Leader>T', '<Cmd>Appearance transparency toggle<CR>', {
+      desc = 'Toggle transparency (persistent)',
+    })
+
     map('n', '<Leader>Pu', vim.pack.update, { desc = 'Update plugins' })
     map('n', '<Leader>Pr', function()
       vim.pack.update(nil, { target = 'lockfile' })

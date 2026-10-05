@@ -105,10 +105,10 @@ end
 
 -- Cursor shape
 vim.opt.gcr = {
-  'i-c-ci-ve:blinkoff500-blinkon500-block-TermCursor',
-  'n-v:block-Curosr/lCursor',
-  'o:hor50-Curosr/lCursor',
-  'r-cr:hor20-Curosr/lCursor',
+  'i-ci:blinkoff500-blinkon500-block-MyModeCursorInsert',
+  'n-v-c-ve:block-MyModeCursorNormal',
+  'o:hor50-MyModeCursorNormal',
+  'r-cr:hor20-MyModeCursorNormal',
 }
 
 -- Use histogram algorithm for diffing, generates more readable diffs in
