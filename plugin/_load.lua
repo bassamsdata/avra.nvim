@@ -8,6 +8,27 @@ end
 
 local load = require('my.utils.load')
 
+-- Only register filename triggers at startup; masking loads on first use.
+local secret_patterns = {
+  '.env',
+  '.env.*',
+  '*.env',
+  '.npmrc',
+  '.pypirc',
+  '*/.aws/credentials',
+}
+load.on_events(
+  {
+    { event = 'BufReadPost', pattern = secret_patterns },
+    { event = 'BufNewFile', pattern = secret_patterns },
+    { event = 'BufFilePost', pattern = secret_patterns },
+  },
+  'plugin.secrets',
+  function(args)
+    require('my.plugin.secrets').setup(secret_patterns, args.buf)
+  end
+)
+
 -- expandtab
 load.on_events('InsertEnter', 'plugin.expandtab', function()
   require('my.plugin.expandtab').setup()

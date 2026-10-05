@@ -23,3 +23,20 @@ mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}" && git clone https://github.com/bas
 Keep Neovim open while background parser and Mason installs finish. Later, launch with `NVIM_APPNAME=nvim.avra nvim`. If setup reports a download failure, restart and check `:messages`, `:Mason`, or `:checkhealth`.
 
 **[Documentation and searchable keymaps](https://bassamsdata.github.io/avra.nvim/)** · [Configuration review](https://bassamsdata.github.io/avra.nvim/config-review.html) · [License](LICENSE)
+
+## Secret masking
+
+Avra automatically conceals each assignment-value character with `*` in
+`.env`, `.env.*`, `*.env`, `.npmrc`, `.pypirc`, and `~/.aws/credentials` files. Keys and standalone
+comments remain visible; quoted multiline values and continued lines are
+masked too. Values stay hidden while typing and selecting text.
+
+Press `<Leader>up` or run `:SecretsToggle` to reveal/hide the current file.
+These controls exist only in matching buffers. To add other assignment-based
+files, extend `secret_patterns` in `plugin/_load.lua`. This is an assignment
+parser, not a general JSON/YAML or arbitrary-secret detector.
+
+No plugin dependency is needed. Startup only registers filename triggers;
+the module loads on the first matching file and updates attached buffers only.
+Masking changes the display, not the file, clipboard, search results, or other
+previews. Window conceal settings are restored when leaving a protected file.
