@@ -5,3 +5,8 @@
 !.skeleton/
 !*.skel
 spell/
+
+# Local runtime output and Python bytecode
+nvim.log
+__pycache__/
+*.py[cod]
