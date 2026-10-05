@@ -43,7 +43,7 @@
       "src": "https://github.com/benlubas/molten-nvim"
     },
     "namu.nvim": {
-      "rev": "9b0b52625d1a23b624bb07a004c667ae2142a42d",
+      "rev": "11e77821fc6796294b13e6ab2509bc2a694f2251",
       "src": "https://github.com/bassamsdata/namu.nvim"
     },
     "nvim-colorizer.lua": {

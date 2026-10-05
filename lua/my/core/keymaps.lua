@@ -68,7 +68,7 @@ require('my.utils.load').on_events(
     map({ 'x', 'n' }, '<M-L>', '<C-w>L', { desc = 'Move window to far right' })
     map({ 'x', 'n' }, '<M-p>', '<C-w>p', { desc = 'Go to the previous window' })
     map({ 'x', 'n' }, '<M-r>', '<C-w>r', { desc = 'Rotate windows downwords/rightwards' })
-    map({ 'x', 'n' }, '<M-R>', '<C-w>r', { desc = 'Rotate windows upwards/leftwords' })
+    map({ 'x', 'n' }, '<M-R>', '<C-w>R', { desc = 'Rotate windows upwards/leftwords' })
     map({ 'x', 'n' }, '<M-v>', '<C-w>v', { desc = 'Split window vertically' })
     map({ 'x', 'n' }, '<M-s>', '<C-w>s', { desc = 'Split window horizontally' })
     map({ 'x', 'n' }, '<M-x>', '<C-w>x', { desc = 'Exchange current window with next one' })
@@ -247,8 +247,8 @@ require('my.utils.load').on_events(
 
     -- Correct misspelled word / mark as correct
     -- stylua: ignore start
-    map('i', '<C-g>+', '<Esc>[szg`]a', { desc = 'Correct misspelled word before cursor' })
-    map('i', '<C-g>=', '<C-g>u<Esc>[s1z=`]a<C-G>u', { desc = 'Add misspelled word before cursor' })
+    map('i', '<C-g>+', '<Esc>[szg`]a', { desc = 'Add word before cursor to dictionary' })
+    map('i', '<C-g>=', '<C-g>u<Esc>[s1z=`]a<C-G>u', { desc = 'Correct misspelled word before cursor' })
     -- stylua: ignore end
 
     -- Only clear highlights and message area and don't redraw if search
@@ -502,6 +502,9 @@ require('my.utils.load').on_events(
 
     map('n', '<Leader>T', '<Cmd>Appearance transparency toggle<CR>', {
       desc = 'Toggle transparency (persistent)',
+    })
+    map('n', '<leader>nr', '<cmd>Namu resume<CR>', {
+      desc = 'Resume last Namu picker',
     })
 
     map('n', '<Leader>Pu', vim.pack.update, { desc = 'Update plugins' })

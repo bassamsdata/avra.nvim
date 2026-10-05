@@ -146,7 +146,7 @@ end
 
 -- stylua: ignore start
 -- nvim's default mapping
-vim.keymap.set({ 'n', 'x' }, '<Leader>d', diagnostic_open_float, { desc = 'Open diagnostic details' })
+vim.keymap.set({ 'n', 'x' }, '<Leader>dd', diagnostic_open_float, { desc = 'Open diagnostic details' })
 vim.keymap.set({ 'n', 'x' }, '<M-d>', diagnostic_open_float, { desc = 'Open diagnostic floating window' })
 vim.keymap.set({ 'n', 'x' }, '<C-w>d', diagnostic_open_float, { desc = 'Open diagnostic floating window' })
 vim.keymap.set({ 'n', 'x' }, '<C-w><C-d>', diagnostic_open_float, { desc = 'Open diagnostic floating window' })

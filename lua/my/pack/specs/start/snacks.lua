@@ -8,7 +8,6 @@ return {
         data = { optional = true },
       },
     },
-    cmds = 'Snacks',
     keys = {
       -- stylua: ignore start
       { lhs = '<Leader>.', opts = { desc = 'Find files' } },
@@ -26,8 +25,6 @@ return {
       { lhs = '<Leader>-', opts = { desc = 'Find lines in buffer' } },
       { lhs = '<Leader>-', opts = { desc = 'Find lines in selection' }, mode = 'x' },
       { lhs = '<Leader>=', opts = { desc = 'Find lines across buffers' } },
-      { lhs = '<Leader>n', opts = { desc = 'Find treesitter nodes' } },
-      { lhs = '<Leader>R', opts = { desc = 'Find symbol locations' } },
       { lhs = '<Leader>f*', mode = { 'n', 'x' }, opts = { desc = 'Grep word under cursor' } },
       { lhs = '<Leader>f#', mode = { 'n', 'x' }, opts = { desc = 'Grep word under cursor' } },
       { lhs = '<Leader>f:', opts = { desc = 'Find commands' } },
@@ -36,9 +33,11 @@ return {
       { lhs = "<Leader>f'", opts = { desc = 'Resume last picker' } },
       { lhs = '<Leader>fA', opts = { desc = 'Find autocmds' } },
       { lhs = '<Leader>fb', opts = { desc = 'Find buffers' } },
+      { lhs = '<Leader>fc', opts = { desc = 'Find nvim config files' } },
+      { lhs = '<Leader>fC', opts = { desc = 'Grep nvim config' } },
       { lhs = '<Leader>fd', opts = { desc = 'Find document diagnostics' } },
       { lhs = '<Leader>fD', opts = { desc = 'Find workspace diagnostics' } },
-      { lhs = '<Leader>ff', opts = { desc = 'Find files' } },
+      { lhs = '<Leader>ff', opts = { desc = 'Find files (smart)' } },
       { lhs = '<Leader>fl', opts = { desc = 'Find location list' } },
       { lhs = '<Leader>fq', opts = { desc = 'Find quickfix list' } },
       { lhs = '<Leader>ft', opts = { desc = 'Find tags' } },
@@ -55,17 +54,6 @@ return {
       { lhs = '<Leader>fo', opts = { desc = 'Find oldfiles' } },
       { lhs = '<Leader>fz', opts = { desc = 'Find directories from z' } },
       { lhs = '<Leader>fw', opts = { desc = 'Find sessions (workspaces)' } },
-      { lhs = '<Leader>fn', opts = { desc = 'Find treesitter nodes' } },
-      { lhs = '<Leader>fs', opts = { desc = 'Find lsp symbols or treesitter nodes' } },
-      { lhs = '<Leader>fSd', opts = { desc = 'Find symbol definitions' } },
-      { lhs = '<Leader>fSD', opts = { desc = 'Find symbol declarations' } },
-      { lhs = '<Leader>fS<C-d>', opts = { desc = 'Find symbol type definitions' } },
-      { lhs = '<Leader>fSs', opts = { desc = 'Find symbol in current document' } },
-      { lhs = '<Leader>fSS', opts = { desc = 'Find symbol in whole workspace' } },
-      { lhs = '<Leader>fSi', opts = { desc = 'Find symbol implementations' } },
-      { lhs = '<Leader>fS<', opts = { desc = 'Find symbol incoming calls' } },
-      { lhs = '<Leader>fS>', opts = { desc = 'Find symbol outgoing calls' } },
-      { lhs = '<Leader>fSr', opts = { desc = 'Find symbol references' } },
       -- stylua: ignore end
     },
     init = function(spec, path)
@@ -158,8 +146,6 @@ return {
       map('n', '<Leader>-', function() picker.lines() end, { desc = 'Find lines in buffer' })
       map('x', '<Leader>-', function() picker.lines() end, { desc = 'Find lines in selection' })
       map('n', '<Leader>=', function() picker.grep_buffers() end, { desc = 'Find lines across buffers' })
-      map('n', '<Leader>n', function() picker.treesitter() end, { desc = 'Find treesitter nodes' })
-      map('n', '<Leader>R', function() picker.lsp_references() end, { desc = 'Find symbol locations' })
       map({ 'n', 'x' }, '<Leader>f*', function() picker.grep_word() end, { desc = 'Grep word under cursor' })
       map({ 'n', 'x' }, '<Leader>f#', function() picker.grep_word() end, { desc = 'Grep word under cursor' })
       map('n', '<Leader>f:', function() picker.commands() end, { desc = 'Find commands' })
@@ -168,9 +154,11 @@ return {
       map('n', "<Leader>f'", function() picker.resume() end, { desc = 'Resume last picker' })
       map('n', '<Leader>fA', function() picker.autocmds() end, { desc = 'Find autocmds' })
       map('n', '<Leader>fb', function() picker.buffers() end, { desc = 'Find buffers' })
+      map('n', '<Leader>fc', function() picker.files({ cwd = vim.fn.stdpath('config') }) end, { desc = 'Find nvim config files' })
+      map('n', '<Leader>fC', function() picker.grep({ cwd = vim.fn.stdpath('config') }) end, { desc = 'Grep nvim config' })
       map('n', '<Leader>fd', function() picker.diagnostics_buffer() end, { desc = 'Find document diagnostics' })
       map('n', '<Leader>fD', function() picker.diagnostics() end, { desc = 'Find workspace diagnostics' })
-      map('n', '<Leader>ff', function() picker.files() end, { desc = 'Find files' })
+      map('n', '<Leader>ff', function() picker.smart() end, { desc = 'Find files (smart)' })
       map('n', '<Leader>fl', function() picker.loclist() end, { desc = 'Find location list' })
       map('n', '<Leader>fq', function() picker.qflist() end, { desc = 'Find quickfix list' })
       map('n', '<Leader>ft', function() picker.tags() end, { desc = 'Find tags' })
@@ -187,17 +175,6 @@ return {
       map('n', '<Leader>fo', function() picker.recent() end, { desc = 'Find oldfiles' })
       map('n', '<Leader>fz', function() picker.zoxide() end, { desc = 'Find directories from z' })
       map('n', '<Leader>fw', find_sessions, { desc = 'Find sessions (workspaces)' })
-      map('n', '<Leader>fn', function() picker.treesitter() end, { desc = 'Find treesitter nodes' })
-      map('n', '<Leader>fs', function() picker.lsp_symbols() end, { desc = 'Find lsp symbols or treesitter nodes' })
-      map('n', '<Leader>fSd', function() picker.lsp_definitions() end, { desc = 'Find symbol definitions' })
-      map('n', '<Leader>fSD', function() picker.lsp_declarations() end, { desc = 'Find symbol declarations' })
-      map('n', '<Leader>fS<C-d>', function() picker.lsp_type_definitions() end, { desc = 'Find symbol type definitions' })
-      map('n', '<Leader>fSs', function() picker.lsp_symbols() end, { desc = 'Find symbol in current document' })
-      map('n', '<Leader>fSS', function() picker.lsp_workspace_symbols() end, { desc = 'Find symbol in whole workspace' })
-      map('n', '<Leader>fSi', function() picker.lsp_implementations() end, { desc = 'Find symbol implementations' })
-      map('n', '<Leader>fS<', function() picker.lsp_incoming_calls() end, { desc = 'Find symbol incoming calls' })
-      map('n', '<Leader>fS>', function() picker.lsp_outgoing_calls() end, { desc = 'Find symbol outgoing calls' })
-      map('n', '<Leader>fSr', function() picker.lsp_references() end, { desc = 'Find symbol references' })
       -- stylua: ignore end
     end,
   },

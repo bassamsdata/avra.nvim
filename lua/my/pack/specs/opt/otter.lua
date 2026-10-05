@@ -4,7 +4,7 @@ return {
   data = {
     events = {
       event = 'FileType',
-      pattern = 'markdown',
+      pattern = { 'markdown', 'norg', 'org' },
     },
     postload = function()
       local ot = require('otter')

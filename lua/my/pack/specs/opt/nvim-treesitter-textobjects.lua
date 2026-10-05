@@ -48,7 +48,7 @@ return {
       vim.keymap.set({ 'x', 'o' }, 'a,', function() sel('@parameter.outer') end,   { desc = 'Select around parameter' })
       vim.keymap.set({ 'x', 'o' }, 'i,', function() sel('@parameter.inner') end,   { desc = 'Select inside parameter' })
       vim.keymap.set({ 'x', 'o' }, 'a/', function() sel('@comment.outer') end,     { desc = 'Select around comment' })
-      vim.keymap.set({ 'x', 'o' }, 'a*', function() sel('@comment.outer') end,     { desc = 'Select inside comment' })
+      vim.keymap.set({ 'x', 'o' }, 'a*', function() sel('@comment.outer') end,     { desc = 'Select around comment' })
       vim.keymap.set({ 'x', 'o' }, 'i/', function() sel('@comment.inner') end,     { desc = 'Select around comment' })
       vim.keymap.set({ 'x', 'o' }, 'i*', function() sel('@comment.inner') end,     { desc = 'Select inside comment' })
       vim.keymap.set({ 'x', 'o' }, 'a.', function() sel('@block.outer') end,       { desc = 'Select around block' })

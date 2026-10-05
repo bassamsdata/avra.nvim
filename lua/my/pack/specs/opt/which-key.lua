@@ -56,7 +56,7 @@ return {
       wk.setup({
         preset = 'helix',
         delay = function(ctx)
-          return ctx.plugin and 0 or 640
+          return ctx.plugin and 0 or 300
         end,
         win = { border = 'solid' },
         sort = {
@@ -116,10 +116,14 @@ return {
             F9 = icons.keys.F9,
             F10 = icons.keys.F10,
             F11 = icons.keys.F11,
-            F12 = icons.keys.F11,
+            F12 = icons.keys.F12,
           },
         },
       })
+
+      vim.keymap.set('n', '<Leader>fK', function()
+        wk.show({ global = false })
+      end, { desc = 'Show buffer-local keymaps' })
 
       wk.add({
         { 'gs', group = 'Text split/swap' },
@@ -129,16 +133,12 @@ return {
         { '<Leader>f', group = 'Find' },
         { '<Leader>fg', group = 'Git' },
         { '<Leader>gf', group = 'Find' },
-        { '<Leader>fS', group = 'LSP' },
-        { '<Leader>G', group = 'Debug' },
-        { '<Leader>t', group = 'Test' },
-        { '<Leader>ty', group = 'Yank' },
+        { '<Leader>t', group = 'Themes' },
+        { '<Leader>s', group = 'Namu symbols' },
+        { '<Leader>n', group = 'Namu' },
+        { '<Leader>d', group = 'Diagnostics / database' },
+        { '<Leader>A', group = 'AI' },
         { '<Leader>P', group = 'Plugin' },
-        { '<Leader><Tab>', group = 'Table mode' },
-        { '<Leader><Tab>d', group = 'Delete' },
-        { '<Leader><Tab>i', group = 'Insert' },
-        { '<Leader><Tab>f', group = 'Formula' },
-        { '<LocalLeader>l', group = 'TeX' },
       })
 
       require('my.utils.hl').persist(function()
