@@ -9,6 +9,10 @@
       "src": "https://github.com/saghen/blink.cmp",
       "version": "1.0.0 - 2.0.0"
     },
+    "codecompanion.nvim": {
+      "rev": "3dd1ef7fa8d6aeb27020023e40293bac588de714",
+      "src": "https://github.com/olimorris/codecompanion.nvim"
+    },
     "dadbod-grip.nvim": {
       "rev": "d3b03fc157f90fe18d112578c2453bc5430b9252",
       "src": "https://github.com/joryeugene/dadbod-grip.nvim"
@@ -24,6 +28,10 @@
     "gruvbox-material": {
       "rev": "11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79",
       "src": "https://github.com/sainnhe/gruvbox-material"
+    },
+    "hive.nvim": {
+      "rev": "4dd4af0d743919ecc0ba51bb0ccd07ada11aff19",
+      "src": "https://github.com/bassamsdata/hive.nvim"
     },
     "img-clip.nvim": {
       "rev": "99848daf801789dbebe2192b475eb887d375002c",
