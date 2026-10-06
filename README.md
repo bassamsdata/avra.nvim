@@ -49,10 +49,31 @@ the module loads on the first matching file and updates attached buffers only.
 Masking changes the display, not the file, clipboard, search results, or other
 previews. Window conceal settings are restored when leaving a protected file.
 
+## UI shortcuts
+
+Press **Space u** in normal mode for the which-key UI group:
+
+| Shortcut | Action |
+| --- | --- |
+| `Space ud` | Toggle inline diagnostic text and underlines; retain signs and statusline counts |
+| `Space uD` | Toggle all diagnostic display, including signs and statusline counts |
+| `Space uw` | Toggle wrapping in the current window |
+| `Space us` | Toggle spell checking in the current window |
+| `Space ut` | Toggle transparency (persistent) |
+| `Space uu` | Toggle Undotree |
+| `Space up` | Toggle secret masking in supported files |
+
+Diagnostic toggles apply to all buffers and preserve display settings and
+running language servers. `uD` restores the inline mode selected with `ud`.
+Automatic diagnostic floats stay hidden while inline diagnostics are off;
+explicit diagnostic details remain available unless all display is off.
+Undotree moved from `Space u` to `Space uu`; transparency moved from `Space T`
+to `Space ut`.
+
 ## Appearance and terminal tool themes
 
 Use `:Appearance` for all appearance settings. It shows status without
-arguments and completes subcommands with Tab. Press **Space, Shift-T** in
+arguments and completes subcommands with Tab. Press **Space u t** in
 normal mode to toggle transparency.
 
 | Command | Effect |

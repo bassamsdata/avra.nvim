@@ -134,6 +134,7 @@ return {
         { '<Leader>fg', group = 'Git' },
         { '<Leader>gf', group = 'Find' },
         { '<Leader>t', group = 'Themes' },
+        { '<Leader>u', group = 'UI' },
         { '<Leader>s', group = 'Namu symbols' },
         { '<Leader>n', group = 'Namu' },
         { '<Leader>d', group = 'Diagnostics / database' },

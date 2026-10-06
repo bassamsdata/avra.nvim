@@ -1,11 +1,25 @@
 local icons = require('my.utils.static.icons')
 
+---@class my.core.diagnostic
+local M = {}
+
+local enabled = true
+local inline_enabled = true
+---@type table<integer, true>
+local float_wins = {}
+
+---Whether diagnostic display and statusline counts are visible.
+---@return boolean
+function M.is_enabled()
+  return enabled
+end
+
 -- Diagnostic configs
 vim.diagnostic.config({
   severity_sort = true,
   jump = {
     on_jump = function(diag, buf)
-      if not diag then
+      if not diag or not enabled or not inline_enabled then
         return
       end
       vim.diagnostic.open_float({
@@ -113,6 +127,68 @@ do
   end)(vim.diagnostic.handlers.virtual_text.show)
 end
 
+-- Gate display handlers instead of changing options, preserving namespace
+-- overrides, option callbacks, and diagnostics disabled by other features.
+for _, name in ipairs({ 'virtual_text', 'virtual_lines', 'underline', 'signs' }) do
+  local show = vim.diagnostic.handlers[name].show
+  if show then
+    ---@param ns integer
+    ---@param buf integer
+    ---@param diags vim.Diagnostic[]
+    ---@param opts? vim.diagnostic.OptsResolved
+    vim.diagnostic.handlers[name].show = function(ns, buf, diags, opts)
+      if enabled and (name == 'signs' or inline_enabled) then
+        show(ns, buf, diags, opts)
+      end
+    end
+  end
+end
+
+local open_float = vim.diagnostic.open_float
+---@param opts? vim.diagnostic.Opts.Float
+---@return integer? float_bufnr
+---@return integer? winid
+function vim.diagnostic.open_float(opts)
+  if not enabled then
+    return
+  end
+  local buf, win = open_float(opts)
+  if win then
+    float_wins[win] = true
+  end
+  return buf, win
+end
+
+---Refresh existing decorations and close diagnostic floats when hiding text.
+---@return nil
+local function refresh_display()
+  if not enabled or not inline_enabled then
+    for win in pairs(float_wins) do
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+      end
+    end
+    float_wins = {}
+  end
+  vim.diagnostic.hide()
+  vim.diagnostic.show()
+  vim.cmd.redrawstatus()
+end
+
+---Toggle inline text and underlines, retaining signs and statusline counts.
+---@return nil
+function M.toggle_inline()
+  inline_enabled = not inline_enabled
+  refresh_display()
+end
+
+---Toggle all diagnostic display, retaining the selected inline mode.
+---@return nil
+function M.toggle()
+  enabled = not enabled
+  refresh_display()
+end
+
 -- stylua: ignore start
 vim.keymap.set({ 'n', 'x' }, '<Leader>dl', function() vim.diagnostic.setloclist() end, { desc = 'Show document diagnostics' })
 vim.keymap.set({ 'n', 'x' }, '<Leader>D', function() vim.diagnostic.setqflist() end, { desc = 'Show workspace diagnostics' })
@@ -120,6 +196,9 @@ vim.keymap.set({ 'n', 'x' }, '<Leader>D', function() vim.diagnostic.setqflist() 
 
 ---Open diagnostic floating window, jump to existing window if possible
 local function diagnostic_open_float()
+  if not enabled then
+    return
+  end
   ---@param win integer
   ---@return boolean
   local function is_diag_win(win)
@@ -201,3 +280,5 @@ vim.keymap.set({ 'n', 'x' }, ']i', function() vim.diagnostic.jump({ count =  vim
 vim.keymap.set({ 'n', 'x' }, '[h', function() vim.diagnostic.jump({ count = -vim.v.count1, severity = vim.diagnostic.severity.HINT }) end, { desc = 'Go to previous diagnostic hint' })
 vim.keymap.set({ 'n', 'x' }, ']h', function() vim.diagnostic.jump({ count =  vim.v.count1, severity = vim.diagnostic.severity.HINT }) end, { desc = 'Go to next diagnostic hint' })
 -- stylua: ignore end
+
+return M

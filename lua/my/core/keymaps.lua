@@ -495,12 +495,26 @@ require('my.utils.load').on_events(
     map('n', '<Leader>.', '<Cmd>FZF<CR>', { desc = 'Find files' })
     map('n', '<Leader>ff', '<Cmd>FZF<CR>', { desc = 'Find files' })
 
+    -- UI toggles; keep the prefix free of actions.
+    map('n', '<Leader>ud', function()
+      require('my.core.diagnostic').toggle_inline()
+    end, { desc = 'Toggle inline diagnostics' })
+    map('n', '<Leader>uD', function()
+      require('my.core.diagnostic').toggle()
+    end, { desc = 'Toggle all diagnostic display' })
+    map('n', '<Leader>uw', function()
+      vim.wo.wrap = not vim.wo.wrap
+    end, { desc = 'Toggle window wrap' })
+    map('n', '<Leader>us', function()
+      vim.wo.spell = not vim.wo.spell
+    end, { desc = 'Toggle window spell checking' })
+
     -- Nvim's new built-in undotree plugin
-    map('n', '<Leader>u', '<Cmd>packadd nvim.undotree|Undotree<CR>', {
+    map('n', '<Leader>uu', '<Cmd>packadd nvim.undotree|Undotree<CR>', {
       desc = 'Toggle undotree',
     })
 
-    map('n', '<Leader>T', '<Cmd>Appearance transparency toggle<CR>', {
+    map('n', '<Leader>ut', '<Cmd>Appearance transparency toggle<CR>', {
       desc = 'Toggle transparency (persistent)',
     })
     map('n', '<leader>nr', '<cmd>Namu resume<CR>', {

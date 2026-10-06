@@ -609,6 +609,11 @@ vim.api.nvim_create_autocmd('DiagnosticChanged', {
 ---Get string representation of diagnostics for current buffer
 ---@return string
 function _G._statusline.diag()
+  ---@type my.core.diagnostic?
+  local diagnostic = package.loaded['my.core.diagnostic']
+  if diagnostic and not diagnostic.is_enabled() then
+    return ''
+  end
   if vim.b.diag_str_cache then
     return vim.b.diag_str_cache
   end
