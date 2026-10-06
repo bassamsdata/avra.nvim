@@ -4,6 +4,7 @@ local M = {}
 local groups = {
   'Normal',
   'NormalNC',
+  'NormalSpecial',
   'NormalFloat',
   'FloatBorder',
   'EndOfBuffer',
