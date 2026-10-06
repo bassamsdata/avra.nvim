@@ -103,6 +103,9 @@ end
 ---@param win integer
 ---@return nil
 function M.attach(buf, win)
+  if vim.g.winbar_hidden then
+    return
+  end
   local configs = require('my.plugin.winbar.configs')
   if configs.eval(configs.opts.bar.enable, buf, win) then
     vim.wo[win][0].winbar = '%{%v:lua._winbar()%}'

@@ -90,6 +90,18 @@ load.on_events('FileType', 'plugin.winbar', function()
   local winbar_api = require('my.plugin.winbar.api')
   vim.keymap.set(
     'n',
+    '<Leader>ub',
+    winbar_api.toggle,
+    { desc = 'Toggle winbar in current window' }
+  )
+  vim.keymap.set(
+    'n',
+    '<Leader>uB',
+    winbar_api.toggle_all,
+    { desc = 'Toggle winbar in all windows' }
+  )
+  vim.keymap.set(
+    'n',
     '<Leader>;',
     winbar_api.pick,
     { desc = 'Pick symbols in winbar' }

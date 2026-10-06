@@ -1,5 +1,34 @@
+---@class my.winbar.api
 local M = {}
 local utils = require('my.plugin.winbar.utils')
+
+---Toggle the internal winbar in the current window
+---@return nil
+function M.toggle()
+  local win = vim.api.nvim_get_current_win()
+  if vim.wo[win].winbar == '%{%v:lua._winbar()%}' then
+    vim.w[win].winbar_no_attach = true
+    vim.wo[win].winbar = ''
+  elseif vim.w[win].winbar_no_attach then
+    vim.w[win].winbar_no_attach = nil
+    utils.bar.attach(vim.api.nvim_win_get_buf(win), win)
+  end
+end
+
+---Toggle the internal winbar in all windows, preserving local toggles
+---@return nil
+function M.toggle_all()
+  vim.g.winbar_hidden = not vim.g.winbar_hidden
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.g.winbar_hidden then
+      if vim.wo[win].winbar == '%{%v:lua._winbar()%}' then
+        vim.wo[win].winbar = ''
+      end
+    else
+      utils.bar.attach(vim.api.nvim_win_get_buf(win), win)
+    end
+  end
+end
 
 ---Get the winbar
 ---@param opts {win: integer?, buf: integer?}?
