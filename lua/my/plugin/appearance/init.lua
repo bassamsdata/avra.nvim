@@ -90,7 +90,10 @@ end
 local function save(keys)
   local stored = read_settings()
   for _, key in ipairs(keys) do
-    stored[key] = settings[key]
+    -- Neovide keeps its highlight transparency choice session-local.
+    if key ~= 'transparent' or not vim.g.neovide then
+      stored[key] = settings[key]
+    end
   end
   local ok = pcall(vim.fn.mkdir, vim.fs.dirname(state_path), 'p')
   local temporary = state_path .. '.' .. vim.fn.getpid() .. '.tmp'
@@ -385,6 +388,9 @@ function M.setup(source_event)
   initialized = true
   for key, value in pairs(read_settings()) do
     settings[key] = value
+  end
+  if vim.g.neovide then
+    settings.transparent = false
   end
   vim.api.nvim_create_user_command('Appearance', command, {
     nargs = '*',

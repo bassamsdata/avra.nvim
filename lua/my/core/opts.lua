@@ -1,6 +1,49 @@
 vim.g.has_ui = #vim.api.nvim_list_uis() > 0
 vim.g.has_nf = vim.env.TERM ~= 'linux' and vim.env.NVIM_NF ~= nil
 
+if vim.g.neovide then
+  vim.g.neovide_input_macos_option_key_is_meta = 'both'
+  vim.g.neovide_cursor_trail_size = 0.9
+  vim.g.neovide_cursor_animation_length = 0.06
+  vim.g.neovide_scroll_animation_length = 0.4
+  vim.opt.linespace = 22
+  vim.g.neovide_hide_mouse_when_typing = true
+  vim.g.neovide_floating_shadow = true
+  vim.g.neovide_floating_blur_amount_x = 6
+  vim.g.neovide_floating_blur_amount_y = 6
+  vim.g.neovide_floating_corner_radius = 0.2
+  vim.g.neovide_light_angle_degrees = 0
+  vim.g.neovide_light_radius = 0
+  vim.g.neovide_padding_right = 0
+  vim.g.neovide_padding_left = 0
+  vim.g.neovide_padding_top = 0
+  vim.g.neovide_padding_bottom = 0
+
+  ---Apply the preferred Neovide opacity and shadows for the current theme.
+  ---@return nil
+  local function sync_neovide_background()
+    local light = vim.o.background == 'light'
+    vim.g.neovide_window_blurred = true
+    vim.g.neovide_opacity = 0.9
+    vim.g.neovide_normal_opacity = light and 0.86 or 0.7
+    vim.g.neovide_floating_z_height = light and 0 or 5
+  end
+
+  sync_neovide_background()
+  local group = vim.api.nvim_create_augroup('my.neovide', { clear = true })
+  vim.api.nvim_create_autocmd('ColorScheme', {
+    group = group,
+    callback = sync_neovide_background,
+    desc = 'Sync Neovide opacity and shadows with the theme',
+  })
+  vim.api.nvim_create_autocmd('OptionSet', {
+    group = group,
+    pattern = 'background',
+    callback = sync_neovide_background,
+    desc = 'Sync Neovide opacity and shadows with background changes',
+  })
+end
+
 vim.opt.exrc = true
 vim.opt.confirm = true
 vim.opt.timeout = false
