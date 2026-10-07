@@ -14,8 +14,6 @@ local groups = {
   'FoldColumn',
   'WinSeparator',
   'VertSplit',
-  'StatusLine',
-  'StatusLineNC',
   'TabLineFill',
   'WinBar',
   'WinBarNC',
