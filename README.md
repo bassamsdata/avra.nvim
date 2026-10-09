@@ -49,6 +49,44 @@ the module loads on the first matching file and updates attached buffers only.
 Masking changes the display, not the file, clipboard, search results, or other
 previews. Window conceal settings are restored when leaving a protected file.
 
+## Window navigation and special buffers
+
+Inside Herdr, **Ctrl h/j/k/l** moves left/down/up/right between Neovim
+windows first. If no window exists in that direction, Avra asynchronously
+asks Herdr to focus the neighboring pane. These mappings work in normal,
+visual, insert, and terminal modes; outside Herdr, existing Ctrl mappings
+are preserved. No Herdr process is launched during Neovim startup.
+
+Keep the Herdr-side [herdr-splits plugin](https://github.com/lmilojevicc/herdr-splits.nvim)
+installed: its `herdr-splits.nav-left/down/up/right` actions route the keys
+into Neovim or move between ordinary terminal panes. Bind those actions to
+`ctrl+h/j/k/l` in Herdr and ensure their forwarded navigation keys match,
+including `ctrl+l` for right navigation. Avra supplies the Neovim side;
+the Neovim package for herdr-splits is not required.
+
+For direct Herdr tab movement, add these fields to the existing `[keys]`
+section in `~/.config/herdr/config.toml`:
+
+```toml
+previous_tab = ["prefix+p", "ctrl+alt+["]
+next_tab = ["prefix+n", "ctrl+alt+]"]
+```
+
+**Ctrl Option [ / ]** on macOS selects the previous/next Herdr tab while
+keeping the prefix shortcuts available. Reload Herdr's configuration from
+its global menu after changing the file. Ghostty's Ctrl Tab shortcuts
+control Ghostty tabs, so the Ctrl Alt bracket pair avoids that overlap.
+
+**Space gg** toggles the current repository's Fugitive status in the current
+Neovim tab, including when another window has focus. Closing status returns
+to the window that opened it when that window still exists.
+
+**q** closes help, quickfix/location lists, man pages, health reports,
+Fugitive status/blame, and read-only Fugitive command output. Modified
+buffers are protected. Closing the final window restores an editing buffer
+or opens an empty buffer instead of exiting Neovim. Normal files retain
+macro recording on q, and commit messages keep their editing behavior.
+
 ## UI shortcuts
 
 Press **Space u** in normal mode for the which-key UI group:
