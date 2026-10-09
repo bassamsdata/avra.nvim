@@ -9,6 +9,8 @@ local function augroup(group, ...)
   end
 end
 
+require('my.plugin.special_buffers').setup()
+
 require('my.utils.load').on_events('UIEnter', 'my.core.modecolor', function()
   vim.schedule(function()
     require('my.core.modecolor').setup()

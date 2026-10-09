@@ -38,7 +38,7 @@ return {
       'DDelete',
     },
     keys = {
-      { lhs = '<Leader>gg', opts = { desc = 'Git summary' } },
+      { lhs = '<Leader>gg', opts = { desc = 'Toggle Git summary' } },
       { lhs = '<Leader>gw', opts = { desc = 'Git show latest commit' } },
       { lhs = '<Leader>gb', opts = { desc = 'Git list local branches' } },
       { lhs = '<Leader>gc', opts = { desc = 'Git commit' } },
@@ -256,7 +256,7 @@ return {
       })
 
       -- stylua: ignore start
-      vim.keymap.set('n', '<Leader>gg',       '<Cmd>Git<CR>',                                  { desc = 'Git summary' })
+      vim.keymap.set('n', '<Leader>gg',       function() require('my.plugin.fugitive').toggle() end, { desc = 'Toggle Git summary' })
       vim.keymap.set('n', '<Leader>gd',       '<Cmd>Gdiff<CR>',                                { desc = 'Git diff current file' })
       vim.keymap.set('n', '<Leader>gw',       '<Cmd>Git show<CR>',                             { desc = 'Git show latest commit' })
       vim.keymap.set('n', '<Leader>gb',       '<Cmd>Git branch<CR><Cmd>call search("^*")<CR>', { desc = 'Git list local branches' })
@@ -275,6 +275,9 @@ return {
         pattern = 'FugitiveIndex',
         group = group,
         callback = function(args)
+          vim.keymap.set('n', 'q', function()
+            require('my.plugin.fugitive').close()
+          end, { buffer = args.buf, desc = 'Close Git summary' })
           vim.keymap.set({ 'n', 'x' }, '[g', '[c', {
             desc = 'Go to previous hunk',
             buffer = args.buf,
