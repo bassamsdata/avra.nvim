@@ -544,6 +544,7 @@ require('my.utils.load').on_events(
         end
       )
     end, { desc = 'Delete plugin' })
+    require('my.plugin.herdr').setup()
   end)
 )
 

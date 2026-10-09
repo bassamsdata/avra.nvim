@@ -298,8 +298,10 @@ return {
           -- stylua: ignore end
           vim.keymap.set('n', '<C-n>', goto_next, { buffer = true })
           vim.keymap.set('n', '<C-p>', goto_prev, { buffer = true })
-          vim.keymap.set('n', '<C-j>', goto_next, { buffer = true })
-          vim.keymap.set('n', '<C-k>', goto_prev, { buffer = true })
+          if vim.env.HERDR_ENV ~= '1' then
+            vim.keymap.set('n', '<C-j>', goto_next, { buffer = true })
+            vim.keymap.set('n', '<C-k>', goto_prev, { buffer = true })
+          end
           vim.keymap.set('n', '<C-^>', function()
             if vim.g.fugitive_prevbuf then
               vim.cmd.cclose()
