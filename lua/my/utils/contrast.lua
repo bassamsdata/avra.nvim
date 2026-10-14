@@ -1,6 +1,21 @@
 ---@class my.utils.contrast
 local M = {}
 
+---Blend two opaque RGB colors without changing their hue endpoints.
+---@param first string
+---@param second string
+---@param amount number
+---@return string
+function M.blend(first, second, amount)
+  local channels = {} ---@type integer[]
+  for offset = 2, 6, 2 do
+    local a = tonumber(first:sub(offset, offset + 1), 16)
+    local b = tonumber(second:sub(offset, offset + 1), 16)
+    channels[#channels + 1] = math.floor(a + (b - a) * amount + 0.5)
+  end
+  return string.format('#%02x%02x%02x', unpack(channels))
+end
+
 ---WCAG relative luminance for an opaque sRGB hex color.
 ---@param color string
 ---@return number

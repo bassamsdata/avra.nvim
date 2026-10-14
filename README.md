@@ -182,7 +182,12 @@ custom theme colors, and calls `herdr server reload-config`. The original
 config is backed up as `config.toml.avra-backup` for restoration and crash
 recovery. Persistence keeps the applied colors and removes the backup on
 normal exit. User edits are preserved. Herdr 0.9.0 and newer support these
-theme options.
+theme options. The bottom tab/status bar and floating panels use an 8% tint
+between the theme background and foreground, giving them a subtle edge while
+transparent terminal panes and the sidebar retain the host backdrop. Inactive
+tabs share the bar's tint, including the gaps and new-tab button.
+Ayu's focused tab uses a softer accent blended 40% toward its foreground,
+with at least 4.5:1 contrast between the tab label and fill.
 
 BTOP, Lazygit, and Yazi also follow the Neovim palette by default. Avra
 generates `~/.config/btop/themes/avra-nvim.theme`, sets only BTOP's

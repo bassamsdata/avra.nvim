@@ -1,6 +1,7 @@
 ---@class my.appearance.herdr
 local M = {}
 local fs = require('my.utils.fs')
+local contrast = require('my.utils.contrast')
 
 local original ---@type string?
 local written ---@type string?
@@ -51,19 +52,33 @@ function M.compose(content, palette, transparent)
         or section == 'theme.custom.light'
         or section == 'theme.custom.dark'
     end
-    if not skip then
+    if not skip and line ~= marker then
       lines[#lines + 1] = line
     end
   end
   local background = transparent and 'reset' or palette.background
   local colors = palette.colors
+  -- The bar and floating panels use an 8% tint. Herdr paints tab gaps and
+  -- the new-tab button with panel_bg, but inactive tabs with surface0.
+  -- Match both even when panes are transparent to avoid contrasting blocks.
+  local panel_bg = contrast.blend(palette.background, palette.foreground, 0.08)
+  local accent = palette.accent or colors[5]
+  if palette.name == 'ayu' or (palette.name or ''):match('^ayu%-') then
+    accent = palette.accent or colors[4]
+    -- Herdr uses panel_bg as the focused label's foreground. Soften Ayu's
+    -- solid accent fill while keeping that label readable in every variant.
+    accent = contrast.background(
+      panel_bg,
+      contrast.blend(accent, palette.foreground, 0.4)
+    )
+  end
   local tokens = {
-    accent = colors[5],
-    panel_bg = background,
+    accent = accent,
+    panel_bg = panel_bg,
     sidebar_bg = background,
     active_row_bg = palette.selection_background,
     selection_bg = palette.selection_background,
-    surface0 = background,
+    surface0 = panel_bg,
     surface1 = background,
     surface_dim = background,
     overlay0 = colors[9],

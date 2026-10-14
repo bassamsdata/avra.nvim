@@ -2,12 +2,14 @@
 local M = {}
 
 ---@class my.appearance.ghostty.palette
+---@field name? string Source colorscheme
 ---@field foreground string
 ---@field background string
 ---@field cursor string
 ---@field selection_foreground string
 ---@field selection_background string
 ---@field colors string[] ANSI colors, indexed from 1
+---@field accent? string Shared UI accent when supplied by the colorscheme
 
 local esc = '\27'
 local terminator = esc .. '\\'
@@ -68,12 +70,14 @@ function M.palette(normal)
       or foreground
   end
   return {
+    name = vim.g.colors_name,
     foreground = foreground,
     background = background,
     cursor = highlight_color('Cursor', 'bg') or foreground,
     selection_foreground = highlight_color('Visual', 'fg') or foreground,
     selection_background = highlight_color('Visual', 'bg') or colors[9],
     colors = colors,
+    accent = highlight_color('AvraAccent', 'fg'),
   }
 end
 
