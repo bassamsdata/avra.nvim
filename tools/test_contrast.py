@@ -59,8 +59,13 @@ class ContrastTests(unittest.TestCase):
             for name, mode in (('ayu-dark', 'dark'), ('ayu-mirage', 'dark'),
                                ('ayu-light', 'light'), ('ayu', 'dark'), ('ayu', 'light')):
                 snapshot = audit.capture(shutil.which('nvim'), name, mode, Path(directory))
+                accent = snapshot['palette']['accent']
+                self.assertNotEqual(accent, snapshot['palette']['colors'][4])
+                self.assertGreaterEqual(audit.contrast(accent, snapshot['palette']['background']), 4.5)
                 for key in ('opencode', 'transparent_opencode'):
                     theme = snapshot[key]
+                    self.assertEqual(theme['primary'], accent)
+                    self.assertEqual(theme['accent'], accent)
                     for surface in ('primary', 'warning'):
                         self.assertGreaterEqual(audit.contrast(theme['selectedListItemText'], theme[surface]), 4.5)
                 self.assertFalse(any(not c['passed'] and c['critical']

@@ -1,5 +1,9 @@
 .PHONY: all
-all: format-check lint accessibility-check
+all: format-check lint accessibility-check recovery-check
+
+.PHONY: recovery-check
+recovery-check:
+	python3 -B tools/test_appearance_recovery.py
 
 .PHONY: format-check
 format-check:

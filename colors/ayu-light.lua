@@ -834,4 +834,6 @@ for name, attr in pairs(hlgroups) do
 end
 -- }}}1
 
+require('my.plugin.appearance.ayu').apply('#ffaa33')
+
 -- vim:ts=2:sw=2:sts=2:fdm=marker

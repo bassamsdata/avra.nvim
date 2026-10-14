@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate standalone colorschemes in colors/ from the cockatoo template.
+"""Generate Avra colorschemes in colors/ from the cockatoo template.
 
 Usage:
   python3 tools/gen_themes.py                # generate all themes
@@ -29,6 +29,7 @@ passes (see constraints()). Output is stylua- and luacheck-clean.
 Ayu uses tools/ayu-palettes.json instead of the hue model. Its upstream
 colors are never tuned; Normal contrast, slot coverage, and rendering are
 validated. Ayu semantic overrides preserve all template highlight groups.
+The local appearance helper supplies a contrast-checked warm UI accent.
 ayu follows background, while ayu-dark, ayu-light, and ayu-mirage pin it.
 Output is deterministic, and all selected themes are validated before writes.
 
@@ -279,6 +280,13 @@ def render_ayu(name, src):
     if name in forced:
         src = src.replace("vim.cmd.hi('clear')",
                           "vim.o.background = '%s'\nvim.cmd.hi('clear')" % forced[name])
+    accents = {mode: AYU_PALETTES[variant]['accent'].lower()
+               for mode, variant in AYU_THEMES[name].items()}
+    accent = ("vim.o.background == 'light' and '%s' or '%s'" %
+              (accents['light'], accents['dark'])) if name == 'ayu' else repr(accents['dark'])
+    # Keep UI accent normalization separate from upstream syntax/ANSI colors.
+    call = "require('my.plugin.appearance.ayu').apply(" + accent + ")\n\n"
+    src = src.replace('-- vim:ts=2:', call + '-- vim:ts=2:')
     return src
 
 

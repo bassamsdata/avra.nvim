@@ -39,11 +39,12 @@ end
 ---@return string
 function M.compose(palette)
   local colors = palette.colors
+  local accent = palette.accent or colors[5]
   local values = {
-    activeBorderColor = { colors[5], 'bold' },
+    activeBorderColor = { accent, 'bold' },
     searchingActiveBorderColor = { colors[7], 'bold' },
     inactiveBorderColor = { colors[9] },
-    optionsTextColor = { colors[5] },
+    optionsTextColor = { accent },
     selectedLineBgColor = { palette.selection_background },
     cherryPickedCommitBgColor = { colors[7] },
     cherryPickedCommitFgColor = { palette.background },

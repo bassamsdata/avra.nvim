@@ -38,6 +38,11 @@ local function opencode()
   return require('my.plugin.appearance.opencode')
 end
 
+---@return my.appearance.sketchybar
+local function sketchybar()
+  return require('my.plugin.appearance.sketchybar')
+end
+
 ---@class my.appearance.settings
 ---@field transparent boolean
 ---@field ghostty_sync boolean
@@ -46,10 +51,11 @@ end
 ---@field lazygit_sync boolean
 ---@field yazi_sync boolean
 ---@field opencode_sync boolean
+---@field sketchybar_sync boolean
 ---@field ghostty_persist boolean
 ---@field herdr_persist boolean
 
----@alias my.appearance.setting 'transparent'|'ghostty_sync'|'herdr_sync'|'btop_sync'|'lazygit_sync'|'yazi_sync'|'opencode_sync'|'ghostty_persist'|'herdr_persist'
+---@alias my.appearance.setting 'transparent'|'ghostty_sync'|'herdr_sync'|'btop_sync'|'lazygit_sync'|'yazi_sync'|'opencode_sync'|'sketchybar_sync'|'ghostty_persist'|'herdr_persist'
 ---@alias my.appearance.switch 'on'|'off'|'toggle'
 
 local state_path = vim.fs.joinpath(vim.fn.stdpath('state'), 'appearance.json')
@@ -62,6 +68,7 @@ local settings = {
   lazygit_sync = true,
   yazi_sync = true,
   opencode_sync = true,
+  sketchybar_sync = true,
   ghostty_persist = false,
   herdr_persist = false,
 }
@@ -139,6 +146,9 @@ local function refresh(force_reload)
   if settings.opencode_sync then
     opencode().sync(palette, settings.transparent)
   end
+  if settings.sketchybar_sync then
+    sketchybar().sync(palette, force_reload)
+  end
 end
 
 ---@return nil
@@ -213,7 +223,7 @@ local function status()
     .. (settings.btop_sync and 'on' or 'off')
     .. ' (persistent)'
   lines[#lines + 1] = 'BTOP sync available: ' .. tostring(btop().available())
-  for _, target in ipairs({ 'lazygit', 'yazi', 'opencode' }) do
+  for _, target in ipairs({ 'lazygit', 'yazi', 'opencode', 'sketchybar' }) do
     lines[#lines + 1] = target
       .. ': sync '
       .. (settings[target .. '_sync'] and 'on' or 'off')
@@ -224,6 +234,8 @@ local function status()
   lines[#lines + 1] = 'Yazi sync available: ' .. tostring(yazi().available())
   lines[#lines + 1] = 'OpenCode sync available: '
     .. tostring(opencode().available())
+  lines[#lines + 1] = 'SketchyBar sync available: '
+    .. tostring(sketchybar().available())
   lines[#lines + 1] = 'Ghostty global sync available: '
     .. tostring(ghostty_config().available())
   local host = ghostty_config().status()
@@ -299,6 +311,7 @@ local function command(args)
     or action == 'lazygit'
     or action == 'yazi'
     or action == 'opencode'
+    or action == 'sketchybar'
   then
     if not valid_switch(words[2]) or #words > 2 then
       warn('usage: :Appearance ' .. action .. ' [on|off|toggle]')
@@ -321,13 +334,15 @@ local function command(args)
       yazi().reset()
     elseif action == 'opencode' and not settings.opencode_sync then
       opencode().reset()
+    elseif action == 'sketchybar' and not settings.sketchybar_sync then
+      sketchybar().reset()
     end
     refresh()
     vim.notify(action .. ' ' .. (settings[key] and 'on' or 'off'))
   else
     warn(
       'usage: :Appearance '
-        .. '[status|refresh|transparency|ghostty|herdr|btop|lazygit|yazi|opencode|persist|export]'
+        .. '[status|refresh|transparency|ghostty|herdr|btop|lazygit|yazi|opencode|sketchybar|persist|export]'
     )
   end
 end
@@ -350,6 +365,7 @@ local function complete(lead, line)
       'lazygit',
       'yazi',
       'opencode',
+      'sketchybar',
       'persist',
       'export',
     }
@@ -366,6 +382,7 @@ local function complete(lead, line)
         or words[2] == 'lazygit'
         or words[2] == 'yazi'
         or words[2] == 'opencode'
+        or words[2] == 'sketchybar'
       ) and index == 2
     )
   then

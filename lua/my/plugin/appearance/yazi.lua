@@ -39,6 +39,7 @@ end
 ---@return string
 function M.compose(palette, transparent)
   local colors = palette.colors
+  local accent = palette.accent or colors[5]
   local background = transparent and 'reset' or palette.background
   local lines = {
     '[app]',
@@ -49,7 +50,7 @@ function M.compose(palette, transparent)
       .. '" }',
     '',
     '[mgr]',
-    'cwd = { fg = "' .. colors[5] .. '" }',
+    'cwd = { fg = "' .. accent .. '" }',
     'find_keyword = { fg = "' .. colors[4] .. '", bold = true }',
     'find_position = { fg = "' .. colors[6] .. '" }',
     'marker_copied = { fg = "'
@@ -69,7 +70,7 @@ function M.compose(palette, transparent)
     'active = { fg = "'
       .. palette.background
       .. '", bg = "'
-      .. colors[5]
+      .. accent
       .. '", bold = true }',
     'inactive = { fg = "' .. colors[9] .. '", bg = "' .. background .. '" }',
     '',
@@ -77,7 +78,7 @@ function M.compose(palette, transparent)
     'normal_main = { fg = "'
       .. palette.background
       .. '", bg = "'
-      .. colors[5]
+      .. accent
       .. '", bold = true }',
     'select_main = { fg = "'
       .. palette.background

@@ -123,6 +123,7 @@ normal mode to toggle transparency.
 | `:Appearance lazygit [on\|off\|toggle]` | Enable or disable Lazygit theme sync |
 | `:Appearance yazi [on\|off\|toggle]` | Enable or disable Yazi theme sync |
 | `:Appearance opencode [on\|off\|toggle]` | Enable or disable OpenCode TUI theme sync |
+| `:Appearance sketchybar [on\|off\|toggle]` | Sync SketchyBar colors and reload the bar |
 | `:Appearance persist ghostty [on\|off\|toggle]` | Keep Ghostty's applied theme after Neovim exits |
 | `:Appearance persist herdr [on\|off\|toggle]` | Keep Herdr's applied theme after Neovim exits |
 | `:Appearance persist all [on\|off\|toggle]` | Set persistence for both terminals |
@@ -193,7 +194,7 @@ BTOP, Lazygit, and Yazi also follow the Neovim palette by default. Avra
 generates `~/.config/btop/themes/avra-nvim.theme`, sets only BTOP's
 `color_theme` option, and sends `SIGUSR2` to running BTOP processes owned by
 the current user after a change. BTOP's previous theme is recorded in
-`stdpath('state')/btop-sync.json` and restored with `:Appearance btop off`.
+`~/.config/btop/avra-nvim-sync.json` and restored with `:Appearance btop off`.
 Lazygit and Yazi receive marked theme blocks in their existing config files;
 disabling sync removes those blocks while preserving the surrounding settings.
 These three themes stay in effect after Neovim exits. Lazygit reads changed
@@ -206,7 +207,12 @@ generates `$XDG_CONFIG_HOME/opencode/themes/avra-nvim.json` (normally
 `tui.json`. Comments, trailing commas, and unrelated settings are preserved.
 The selection persists after Neovim exits. `:Appearance opencode off`
 restores the previous selection and removes the unedited generated theme.
-Recovery information lives in `stdpath('state')/opencode-sync.json`.
+Recovery information lives in `~/.config/opencode/avra-nvim-sync.json`.
+Both tools keep recovery state beside their config under `XDG_CONFIG_HOME`,
+so default Neovim and alternate `NVIM_APPNAME` configurations share it.
+Existing journals in Neovim state directories migrate automatically when
+their target config and saved fields match; conflicting records are preserved
+and reported.
 Focused menu text is chosen against OpenCode's `primary` background, with
 a minimum contrast of 4.5:1. The same token is used for warning/paste badges;
 if needed, only the exported warning color is shaded to keep that text
@@ -219,6 +225,16 @@ Restart an open OpenCode session after changing the theme. Project TUI
 settings take precedence over the global selection; remove a project theme
 override if you want it to follow Avra. Explicit `OPENCODE_TUI_CONFIG` or
 `OPENCODE_CONFIG_DIR` overrides disable this global integration.
+
+SketchyBar Island follows the same palette after a colorscheme or background
+change. The integration writes only `~/.config/sketchybar/appearance.json` (or
+under `XDG_CONFIG_HOME`) and runs `sketchybar --reload`; layout, font, opacity,
+and feature settings in `config.json` stay under your control. This requires
+the local Island runtime with `plugins/palette.py`. The generated palette
+persists after Neovim exits; `:Appearance sketchybar off` removes the verified
+managed palette and reloads the bar's configured dark/light theme. Manually
+edited palettes are preserved and reported. `:Appearance refresh` also forces
+a SketchyBar reload when colors have not changed.
 
 Appearance setup is lazy loaded on `UIEnter`. Neovim restores its own saved
 background early in `my.core.autocmds` and applies saved transparency after
@@ -254,6 +270,14 @@ with Avra's existing Treesitter, LSP, diagnostics, and plugin highlights.
 Upstream syntax colors are kept unchanged, including the softer Light
 accents; the generator does not enforce AA contrast on every syntax color.
 The main text contrast is checked for all variants.
+
+Ayu's UI accent is warm amber: `#e6b450` in Dark, `#ffcc66` in Mirage,
+and a contrast-adjusted ochre (`#92611d`) in Light. `AvraAccent` supplies this
+shared color to Herdr, BTOP, Lazygit, Yazi, OpenCode, and SketchyBar. Ghostty
+uses the matching cursor and selection colors. Neovim's cursor, active line
+number, and selection surfaces use the same accent; syntax and ANSI blue
+remain unchanged. The helper shades only the UI accent when needed to keep
+at least 4.5:1 contrast on the normal background and Herdr's tinted bar.
 
 Regenerate only Ayu with
 `python3 tools/gen_themes.py ayu ayu-dark ayu-light ayu-mirage`.

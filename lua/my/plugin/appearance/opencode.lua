@@ -2,6 +2,7 @@
 local M = {}
 local fs = require('my.utils.fs')
 local managed = require('my.plugin.appearance.managed')
+local recovery = require('my.plugin.appearance.recovery')
 local config = require('my.plugin.appearance.opencode_config')
 local transparency = require('my.plugin.appearance.transparency')
 local contrast = require('my.utils.contrast')
@@ -12,8 +13,7 @@ local config_dir = vim.fs.joinpath(
 )
 local theme_name = 'avra-nvim'
 local theme_path = vim.fs.joinpath(config_dir, 'themes', theme_name .. '.json')
-local state_path =
-  vim.fs.joinpath(vim.fn.stdpath('state'), 'opencode-sync.json')
+local state_path = vim.fs.joinpath(config_dir, 'avra-nvim-sync.json')
 local warned ---@type string?
 
 ---@class my.appearance.opencode.state
@@ -46,12 +46,9 @@ local function write(path, content)
     and managed.write(path, content)
 end
 
----@return my.appearance.opencode.state?, boolean
-local function read_state()
-  local content = fs.read_file(state_path)
-  if not content then
-    return nil, true
-  end
+---@param content string
+---@return my.appearance.opencode.state?
+local function decode_state(content)
   local ok, state = pcall(vim.json.decode, content)
   if
     ok
@@ -61,10 +58,32 @@ local function read_state()
     and (state.theme_hash == nil or type(state.theme_hash) == 'string')
     and (state.pending_hash == nil or type(state.pending_hash) == 'string')
   then
-    return state, true
+    return state
   end
-  warn('invalid recovery state: ' .. state_path)
-  return nil, false
+  return nil
+end
+
+---@return my.appearance.opencode.state?, boolean
+local function read_state()
+  local content, err = recovery.read(
+    state_path,
+    'opencode-sync.json',
+    function(saved)
+      return decode_state(saved) ~= nil
+    end
+  )
+  if err then
+    warn(err)
+    return nil, false
+  end
+  if not content then
+    return nil, true
+  end
+  local state = decode_state(content)
+  if not state then
+    warn('invalid recovery state: ' .. state_path)
+  end
+  return state, state ~= nil
 end
 
 ---@return boolean
@@ -103,9 +122,9 @@ function M.compose(palette, transparent)
   local removed = color('DiffRemoved', 'fg', palette.colors[2])
   local muted = color('Comment', 'fg', palette.colors[9])
   local theme = {
-    primary = color('Function', 'fg', palette.colors[5]),
+    primary = palette.accent or color('Function', 'fg', palette.colors[5]),
     secondary = color('Constant', 'fg', palette.colors[6]),
-    accent = color('CursorLineNr', 'fg', palette.colors[4]),
+    accent = palette.accent or color('CursorLineNr', 'fg', palette.colors[4]),
     error = color('DiagnosticError', 'fg', palette.colors[2]),
     warning = color('DiagnosticWarn', 'fg', palette.colors[4]),
     success = color('DiagnosticOk', 'fg', added),
@@ -119,7 +138,8 @@ function M.compose(palette, transparent)
     backgroundElement = color('CursorLine', 'bg', panel),
     backgroundMenu = panel,
     border = color('FloatBorder', 'fg', muted),
-    borderActive = color('CursorLineNr', 'fg', palette.colors[4]),
+    borderActive = palette.accent
+      or color('CursorLineNr', 'fg', palette.colors[4]),
     borderSubtle = color('WinSeparator', 'fg', muted),
     diffAdded = added,
     diffRemoved = removed,
