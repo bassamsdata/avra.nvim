@@ -17,6 +17,10 @@
       "rev": "3dd1ef7fa8d6aeb27020023e40293bac588de714",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
+    "codediff.nvim": {
+      "rev": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e",
+      "src": "https://github.com/esmuellert/codediff.nvim"
+    },
     "dadbod-grip.nvim": {
       "rev": "d3b03fc157f90fe18d112578c2453bc5430b9252",
       "src": "https://github.com/joryeugene/dadbod-grip.nvim"
@@ -61,6 +65,10 @@
     "namu.nvim": {
       "rev": "11e77821fc6796294b13e6ab2509bc2a694f2251",
       "src": "https://github.com/bassamsdata/namu.nvim"
+    },
+    "neogit": {
+      "rev": "a6549816e62cec7037f1549d8f1659d45635370c",
+      "src": "https://github.com/NeogitOrg/neogit"
     },
     "nvim-colorizer.lua": {
       "rev": "72a05f62c52241bc7441c820eb53946f92b2e6a4",

@@ -87,6 +87,27 @@ buffers are protected. Closing the final window restores an editing buffer
 or opens an empty buffer instead of exiting Neovim. Normal files retain
 macro recording on q, and commit messages keep their editing behavior.
 
+## Neogit and CodeDiff
+
+Neogit and CodeDiff load on their commands or shortcuts. Press **Space gn**
+for the which-key submenu; existing Fugitive and Gitsigns shortcuts remain
+available, including **Space gg** for Fugitive status.
+
+| Shortcut | Action |
+| --- | --- |
+| `Space gnn` | Open Neogit status in a new tab |
+| `Space gnc` | Open Neogit's commit popup |
+| `Space gnb` | Open Neogit's branch popup |
+| `Space gnl` | Open Neogit's log popup |
+| `Space gns` | Open Neogit's stash popup |
+| `Space gnd` | Review repository changes with CodeDiff |
+| `Space gnD` | Review staged changes with CodeDiff |
+
+`:Neogit` and `:CodeDiff` work directly too. Neogit uses the existing Snacks
+picker and CodeDiff for its diff viewer. CodeDiff automatically downloads
+its native diff library on first use; see its
+[installation notes](https://github.com/esmuellert/codediff.nvim#installation).
+
 ## UI shortcuts
 
 Press **Space u** in normal mode for the which-key UI group:

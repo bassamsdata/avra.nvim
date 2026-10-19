@@ -58,6 +58,13 @@ return {
         delay = function(ctx)
           return ctx.plugin and 0 or 300
         end,
+        triggers = {
+          { '<auto>', mode = 'nxso' },
+          -- Built-in operators need explicit triggers for surround hints.
+          { 'y', mode = 'n' },
+          { 'd', mode = 'n' },
+          { 'c', mode = 'n' },
+        },
         win = { border = 'solid' },
         sort = {
           'local',
@@ -126,10 +133,22 @@ return {
       end, { desc = 'Show buffer-local keymaps' })
 
       wk.add({
+        -- Descriptions only: nvim-surround owns these lazy-loaded mappings.
+        { 'ys', desc = 'Surround motion (ysiw" quotes a word)' },
+        { 'yss', desc = 'Surround line (yss")' },
+        { 'yS', desc = 'Surround motion on new lines' },
+        { 'ySS', desc = 'Surround line on new lines' },
+        { 'ds', desc = 'Delete surround (ds")' },
+        { 'cs', desc = [[Change surround (cs"' changes " to ')]] },
+        { 'S', mode = 'x', desc = 'Surround selection (S")' },
+        { 'gS', mode = 'x', desc = 'Surround selection on new lines' },
+        { '<C-g>s', mode = 'i', desc = 'Surround at cursor' },
+        { '<C-g>S', mode = 'i', desc = 'Surround at cursor on new lines' },
         { 'gs', group = 'Text split/swap' },
         { 'gq', group = 'Format' },
         { 'gr', group = 'LSP' },
         { '<Leader>g', group = 'Git' },
+        { '<Leader>gn', group = 'Neogit / CodeDiff' },
         { '<Leader>f', group = 'Find' },
         { '<Leader>fg', group = 'Git' },
         { '<Leader>gf', group = 'Find' },
