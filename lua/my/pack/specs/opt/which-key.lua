@@ -149,6 +149,7 @@ return {
         { 'gr', group = 'LSP' },
         { '<Leader>g', group = 'Git' },
         { '<Leader>gn', group = 'Neogit / CodeDiff' },
+        { '<Leader>gv', group = 'DiffBandit (trial)' },
         { '<Leader>f', group = 'Find' },
         { '<Leader>fg', group = 'Git' },
         { '<Leader>gf', group = 'Find' },

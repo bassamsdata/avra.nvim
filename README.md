@@ -37,6 +37,36 @@ see [Codex providers](docs/codex.md) for launchers, models, and credentials.
 
 **[Documentation and searchable keymaps](https://bassamsdata.github.io/avra.nvim/)** · [Configuration review](https://bassamsdata.github.io/avra.nvim/config-review.html) · [License](LICENSE)
 
+## DiffBandit trial
+
+[DiffBandit](https://github.com/CoreyKaylor/diffbandit.nvim) loads only on
+its commands or shortcuts. Restart Neovim, then press **Space gv** for the
+which-key submenu.
+
+| Shortcut | Action |
+| --- | --- |
+| `Space gvv` | Review all repository changes |
+| `Space gvf` | Review the current file |
+| `Space gvs` | Review staged changes |
+| `Space gvc` | Open/toggle the commit panel; focus it from a diff pane |
+| `Space gvm` | Open the Git workflow menu |
+| `Space gvq` | Close the current DiffBandit view |
+
+Inside its views, `]c` / `[c` move between hunks, `]f` / `[f` switch files,
+and `q` closes the view. `Space gvt` toggles staging for the active hunk or
+panel file; `Space gvA` toggles amend in the commit message buffer.
+Writing that commit message with `:w` commits staged changes. Folder views
+use `Space gve` or `za` to expand a directory. These replace the plugin's
+Space bindings so leader shortcuts stay available. `gzt` / `gzb` align
+document tops/bottoms, `gzs` aligns the other pane to the cursor, and `gzu`
+undoes a DiffBandit action, preserving diagnostic, spelling, and native
+undo keys. Other plugin keys are shown with `g?` in a diff view.
+
+To remove the trial, delete `lua/my/pack/specs/opt/diffbandit.lua`, remove
+its `Space gv` group from `which-key.lua` and this README section, then
+restart Neovim. Run `:lua vim.pack.del({ 'diffbandit.nvim' })` to remove
+the installed plugin and its lockfile entry.
+
 ## Secret masking
 
 Avra automatically conceals each assignment-value character with `*` in

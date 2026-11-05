@@ -25,6 +25,10 @@
       "rev": "d3b03fc157f90fe18d112578c2453bc5430b9252",
       "src": "https://github.com/joryeugene/dadbod-grip.nvim"
     },
+    "diffbandit.nvim": {
+      "rev": "1acb4a55457535be9ab79ab1e90197366e38f2a2",
+      "src": "https://github.com/CoreyKaylor/diffbandit.nvim"
+    },
     "everforest": {
       "rev": "85a86eb62409e3ec88713bff3d1b9d7374e112e4",
       "src": "https://github.com/sainnhe/everforest"
