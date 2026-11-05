@@ -14,21 +14,24 @@ import check_contrast as audit
 
 class ContrastTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('nvim'), 'requires Neovim')
-    def test_insert_indicator_contrast_across_all_themes(self):
+    def test_insert_cursor_contrast_across_all_themes(self):
         with tempfile.TemporaryDirectory(prefix='avra-mode-contrast-') as directory:
             for path in sorted((audit.REPO / 'colors').glob('*.lua')):
                 for mode in ('dark', 'light'):
                     snapshot = audit.capture(shutil.which('nvim'), path.stem, mode, Path(directory))
                     rows = [c for c in audit.audit(snapshot)['checks']
-                            if c['label'] == 'Neovim MyModeInsertLineNr']
-                    self.assertEqual(len(rows), 1)
-                    self.assertTrue(rows[0]['passed'], f'{path.stem}/{mode}: {rows[0]}')
+                            if c['label'] in ('Neovim MyModeCursorInsert',
+                                              'Neovim insert cursor visibility')]
+                    self.assertEqual(len(rows), 2)
+                    self.assertTrue(all(c['passed'] for c in rows), f'{path.stem}/{mode}: {rows}')
+                    self.assertNotEqual(snapshot['highlights']['MyModeCursorInsert']['bg'],
+                                        snapshot['highlights']['MyModeCursorNormal']['bg'])
                     # Ensure the gate detects an unreadable indicator.
                     if path.stem == 'seaglass':
                         broken = copy.deepcopy(snapshot)
-                        broken['highlights']['MyModeInsertLineNr']['fg'] = snapshot['highlights']['Normal']['bg']
+                        broken['highlights']['MyModeCursorInsert']['fg'] = broken['highlights']['MyModeCursorInsert']['bg']
                         failures = [c for c in audit.audit(broken)['checks']
-                                    if c['label'] == 'Neovim MyModeInsertLineNr' and not c['passed']]
+                                    if c['label'] == 'Neovim MyModeCursorInsert' and not c['passed']]
                         self.assertEqual(len(failures), 1)
 
     def test_wcag_reference_pairs_and_threshold(self):
@@ -114,13 +117,45 @@ local warning = contrast.background(text, '#f09276')
 assert(contrast.ratio(text, warning) >= 4.5)
 assert(contrast.background('#000000', '#f09276') == '#f09276')
 vim.cmd.colorscheme('seaglass')
-vim.api.nvim_set_hl(0, 'Purple', { fg = '#244736' })
-require('my.core.modecolor').setup()
-local number = vim.api.nvim_get_hl(0, { name = 'MyModeInsertLineNr' })
-local normal = vim.api.nvim_get_hl(0, { name = 'Normal' })
-assert(contrast.ratio('#244736', string.format('#%06x', normal.bg)) < 4.5)
-assert(contrast.ratio(string.format('#%06x', number.fg),
-  string.format('#%06x', normal.bg)) >= 4.5)
+local modecolor = require('my.core.modecolor')
+local function hl(name)
+  return vim.api.nvim_get_hl(0, { name = name, link = false })
+end
+local number = hl('CursorLineNr')
+local normal = hl('Normal')
+vim.api.nvim_set_hl(0, 'iCursor', { bg = '#244736' })
+modecolor.setup()
+local cursor = hl('MyModeCursorInsert')
+assert(contrast.ratio('#244736', string.format('#%06x', normal.bg)) < 3)
+assert(contrast.ratio(string.format('#%06x', cursor.bg),
+  string.format('#%06x', normal.bg)) >= 3)
+assert(vim.deep_equal(hl('CursorLineNr'), number))
+assert(#vim.api.nvim_get_autocmds({ group = 'my.modecolor', event = 'ModeChanged' }) == 0)
+vim.api.nvim_set_hl(0, 'iCursor', { bg = '#ff8844' })
+modecolor.setup()
+assert(hl('MyModeCursorInsert').bg == 0xff8844)
+vim.api.nvim_set_hl(0, 'iCursor', { link = 'Cursor' })
+vim.api.nvim_set_hl(0, 'CursorInsert', { bg = '#44bbff' })
+modecolor.setup()
+assert(hl('MyModeCursorInsert').bg == 0x44bbff)
+assert(vim.deep_equal(hl('CursorLineNr'), number))
+vim.api.nvim_set_hl(0, 'CursorInsert', { reverse = true, fg = '#44bbff', bg = '#111111' })
+modecolor.setup()
+assert(hl('MyModeCursorInsert').bg == 0x44bbff)
+vim.cmd.colorscheme('ayu-dark')
+assert(hl('MyModeCursorNormal').bg == hl('Cursor').bg)
+assert(hl('MyModeCursorInsert').bg ~= hl('MyModeCursorNormal').bg)
+-- An empty theme still gets a distinct, visible insert cursor.
+for _, name in ipairs({ 'iCursor', 'CursorInsert', 'InsertCursor', 'CursorIM',
+  'InsertMode', 'String', 'DiagnosticOk', 'Function', 'Statement', 'Special' }) do
+  vim.api.nvim_set_hl(0, name, {})
+end
+modecolor.setup()
+cursor = hl('MyModeCursorInsert')
+normal = hl('Normal')
+assert(cursor.bg ~= hl('MyModeCursorNormal').bg)
+assert(contrast.ratio(string.format('#%06x', cursor.bg),
+  string.format('#%06x', normal.bg)) >= 3)
 """
         with tempfile.TemporaryDirectory(prefix='avra-contrast-lua-') as directory:
             env = os.environ.copy()

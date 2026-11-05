@@ -156,6 +156,7 @@ return {
         { '<Leader>u', group = 'UI' },
         { '<Leader>s', group = 'Namu symbols' },
         { '<Leader>n', group = 'Namu' },
+        { '<Leader>m', group = 'Multicursor', mode = { 'n', 'x' } },
         { '<Leader>d', group = 'Diagnostics / database' },
         { '<Leader>A', group = 'AI' },
         { '<Leader>P', group = 'Plugin' },

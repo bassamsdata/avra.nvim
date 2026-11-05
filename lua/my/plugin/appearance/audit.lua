@@ -31,7 +31,8 @@ function M.snapshot(name, background)
     error(err)
   end
   require('my.core.modecolor').setup()
-  groups.MyModeInsertLineNr = true
+  groups.MyModeCursorNormal = true
+  groups.MyModeCursorInsert = true
   -- Include common surfaces even when a theme inherits Neovim defaults.
   for _, group in ipairs({
     'Normal',

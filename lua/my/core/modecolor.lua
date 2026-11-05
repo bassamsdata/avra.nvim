@@ -2,88 +2,123 @@
 local M = {}
 local contrast = require('my.utils.contrast')
 
----Configure native cursor colors and a terminal-independent mode indicator.
+---@param name string
+---@return vim.api.keyset.get_hl_info
+local function highlight(name)
+  return vim.api.nvim_get_hl(0, {
+    name = name,
+    link = false,
+    create = false,
+  })
+end
+
+---@param color integer
+---@return string
+local function hex(color)
+  return string.format('#%06x', color)
+end
+
+---Choose a visible insert cursor that differs from the normal cursor.
+---@param background integer
+---@param normal integer
+---@return integer, integer? fill, preferred text
+local function insert_color(background, normal)
+  ---@param color integer?
+  ---@return integer?
+  local function usable(color)
+    if not color or color == normal then
+      return nil
+    end
+    local adjusted =
+      tonumber(contrast.background(hex(background), hex(color), 3):sub(2), 16)
+    return adjusted ~= normal and adjusted or nil
+  end
+
+  for _, name in ipairs({
+    'iCursor',
+    'CursorInsert',
+    'InsertCursor',
+    'CursorIM',
+  }) do
+    local attrs = highlight(name)
+    local fill_color, text_color = attrs.bg, attrs.fg
+    if attrs.reverse then
+      fill_color, text_color = attrs.fg, attrs.bg
+    end
+    local fill = usable(fill_color)
+    if fill then
+      return fill, text_color
+    end
+  end
+  for _, name in ipairs({
+    'InsertMode',
+    'String',
+    'DiagnosticOk',
+    'Function',
+    'Statement',
+    'Special',
+  }) do
+    local attrs = highlight(name)
+    local fill = usable(name == 'InsertMode' and attrs.bg or attrs.fg)
+    if fill then
+      return fill
+    end
+  end
+  -- Minimal themes may define neither a cursor nor any syntax accents.
+  return usable(0x5faf5f) or usable(0xb2a0ee) or background
+end
+
+---Configure native per-mode cursors without touching line-number colors.
 ---@return nil
 function M.setup()
   local group = vim.api.nvim_create_augroup('my.modecolor', {})
-  local normal = {} ---@type vim.api.keyset.get_hl_info
-  local insert = {} ---@type vim.api.keyset.get_hl_info
-  local active ---@type boolean?
-
-  ---@param name string
-  ---@return vim.api.keyset.get_hl_info
-  local function highlight(name)
-    return vim.api.nvim_get_hl(0, {
-      name = name,
-      link = false,
-      create = false,
-    })
-  end
-
-  ---@param mode string
-  ---@return nil
-  local function apply(mode)
-    local inserting = mode:sub(1, 1) == 'i'
-    if active == inserting then
-      return
-    end
-    active = inserting
-    vim.api.nvim_set_hl(0, 'CursorLineNr', inserting and insert or normal)
-  end
 
   ---@return nil
   local function refresh()
-    normal = vim.api.nvim_get_hl(0, {
-      name = 'CursorLineNr',
-      create = false,
-    })
-    local base = highlight('Normal')
-    -- Prefer a purple editing accent, distinct from green/teal backgrounds.
-    local accent = highlight('Purple')
-    if not accent.fg then
-      accent = highlight('Statement')
-    end
-    if not accent.fg then
-      accent = highlight('InsertMode')
-    end
-    local cursor = highlight('Cursor')
-    insert = highlight('CursorLineNr')
-    local backdrop = insert.bg
-      or base.bg
+    local transparency = package.loaded['my.plugin.appearance.transparency']
+    local base = transparency and transparency.original('Normal')
+      or highlight('Normal')
+    local bg = base.bg
       or (vim.o.background == 'light' and 0xffffff or 0x101010)
-    -- Contrast is symmetric: adjust the accent as the second color, leaving
-    -- the real backdrop untouched. Preserve readable theme colors verbatim.
-    local color_hex = contrast.background(
-      string.format('#%06x', backdrop),
-      string.format('#%06x', accent.fg or 0xb2a0ee)
+    local fg = base.fg
+      or (vim.o.background == 'light' and 0x222222 or 0xeeeeee)
+    local cursor = highlight('Cursor')
+    local normal_bg = cursor.reverse and (cursor.fg or fg) or cursor.bg or fg
+    local normal_fg = cursor.reverse and (cursor.bg or bg) or cursor.fg or bg
+    local color, preferred_text = insert_color(bg, normal_bg)
+    local text = contrast.foreground(
+      { hex(color) },
+      { hex(preferred_text or bg), hex(fg), '#000000', '#ffffff' }
     )
-    local color = tonumber(color_hex:sub(2), 16)
-    -- Dedicated groups leave the colorscheme's Cursor/TermCursor untouched.
+    -- Neovim emits cursor colors through guicursor; no per-mode subprocesses.
     vim.api.nvim_set_hl(0, 'MyModeCursorNormal', {
-      fg = cursor.fg or base.bg or 0x101010,
-      bg = cursor.bg or base.fg or 0xeeeeee,
+      fg = normal_fg,
+      bg = normal_bg,
     })
     vim.api.nvim_set_hl(0, 'MyModeCursorInsert', {
-      fg = base.bg or 0x101010,
+      fg = tonumber(text:sub(2), 16),
       bg = color,
     })
-    insert.fg = color
-    insert.ctermfg = accent.ctermfg or 2
-    insert.reverse = nil
-    -- Stable group for inspection and the accessibility report.
-    vim.api.nvim_set_hl(0, 'MyModeInsertLineNr', insert)
-    active = nil
-    apply(vim.api.nvim_get_mode().mode)
+
+    -- Paused: the cursor now provides the insert-mode cue.
+    -- local number = highlight('CursorLineNr')
+    -- vim.api.nvim_set_hl(0, 'MyModeNormalLineNr', number)
+    -- number.fg = color
+    -- number.reverse = nil
+    -- vim.api.nvim_set_hl(0, 'MyModeInsertLineNr', number)
   end
 
-  vim.api.nvim_create_autocmd('ModeChanged', {
-    group = group,
-    pattern = { '*:i*', 'i*:*' },
-    desc = 'Change line-number color only when entering/leaving insert mode',
-    callback = function()
-      apply(vim.v.event.new_mode)
-    end,
-  })
+  -- vim.api.nvim_create_autocmd('ModeChanged', {
+  --   group = group,
+  --   pattern = { '*:i*', 'i*:*' },
+  --   desc = 'Change line-number color when entering/leaving insert mode',
+  --   callback = function()
+  --     local inserting = vim.v.event.new_mode:sub(1, 1) == 'i'
+  --     vim.api.nvim_set_hl(0, 'CursorLineNr', {
+  --       link = inserting and 'MyModeInsertLineNr' or 'MyModeNormalLineNr',
+  --     })
+  --   end,
+  -- })
   vim.api.nvim_create_autocmd('ColorScheme', {
     group = group,
     callback = refresh,

@@ -141,8 +141,15 @@ def audit(snapshot):
                               context='Non-text surface; decorative treatments may be exempt'))
             continue
         rows.append(check('Neovim ' + group, fg, bg,
-                          critical=group == 'MyModeInsertLineNr',
+                          critical=group == 'MyModeCursorInsert',
                           context='Inherited surface: ' + parent))
+
+    insert = highlights.get('MyModeCursorInsert', {})
+    if isinstance(insert.get('bg'), int):
+        rows.append(check('Neovim insert cursor visibility',
+                          hex_color(insert['bg'], normal_fg), normal_bg,
+                          critical=True, minimum=3.0,
+                          context='Cursor fill against the editor background'))
 
     # Selection/search overlays can cover syntax text as well as Normal text.
     # This catches combinations hidden by checking palette slots in isolation.

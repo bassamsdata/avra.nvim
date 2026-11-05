@@ -8,6 +8,23 @@ end
 
 local load = require('my.utils.load')
 
+-- Keep the terminal agents independent of CodeCompanion and Hive.
+load.on_cmds('AI', 'plugin.ai', function()
+  require('my.plugin.ai').setup()
+end)
+vim.keymap.set('n', '<Leader>Ao', '<Cmd>AI<CR>', {
+  desc = 'Open AI picker (Codex / GLM / OpenRouter)',
+})
+vim.keymap.set('n', '<Leader>Ax', '<Cmd>AI codex<CR>', {
+  desc = 'Open Codex terminal',
+})
+vim.keymap.set('n', '<Leader>Ag', '<Cmd>AI glm<CR>', {
+  desc = 'Open GLM terminal',
+})
+vim.keymap.set('n', '<Leader>Ar', '<Cmd>AI openrouter<CR>', {
+  desc = 'Open OpenRouter terminal',
+})
+
 -- Only register filename triggers at startup; masking loads on first use.
 local secret_patterns = {
   '.env',

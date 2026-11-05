@@ -30,6 +30,11 @@ when present and otherwise use their managed installations. No development
 checkout is required on a fresh machine. CodeCompanion and Hive load only when
 you use an AI command or shortcut; configure provider credentials separately.
 
+**Space Ao** opens a Codex / GLM / OpenRouter terminal picker for the current
+project. Use **Space Ax** for Codex, **Space Ag** for GLM, or **Space Ar** for
+OpenRouter directly. GLM and OpenRouter use separate local Codex homes;
+see [Codex providers](docs/codex.md) for launchers, models, and credentials.
+
 **[Documentation and searchable keymaps](https://bassamsdata.github.io/avra.nvim/)** · [Configuration review](https://bassamsdata.github.io/avra.nvim/config-review.html) · [License](LICENSE)
 
 ## Secret masking
@@ -134,6 +139,14 @@ to `Space ut`.
 Use `:Appearance` for all appearance settings. It shows status without
 arguments and completes subcommands with Tab. Press **Space u t** in
 normal mode to toggle transparency.
+
+Insert mode uses a colorscheme-aware cursor through `guicursor`. Avra prefers
+`iCursor`, `CursorInsert`, `InsertCursor`, then `CursorIM`; missing colors or
+colors matching the normal cursor fall back to the theme's insert-mode or
+syntax accents. Cursor fills keep at least 3:1 contrast against the editor
+background. The former insert-mode statuscolumn number color is commented
+out. Cursor colors require terminal support, including cursor-color forwarding
+when using a multiplexer such as Herdr.
 
 | Command | Effect |
 | --- | --- |

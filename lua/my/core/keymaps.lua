@@ -58,6 +58,70 @@ require('my.utils.load').on_events(
 
     local key = require('my.utils.key')
 
+    -- Native multicursors (:help multicursor). Keep modified arrows and
+    -- Ctrl keys available for window navigation, terminals, and notebooks.
+    ---@param motion 'j'|'k'
+    ---@return nil
+    local function add_line_cursors(motion)
+      -- Consume the count here: [count]Q means force add/remove, not repeat.
+      vim.cmd.normal({
+        string.rep('1Q' .. motion, vim.v.count1),
+        bang = true,
+      })
+    end
+
+    ---Add the next [count] matches of the word or Visual selection.
+    ---@return nil
+    local function add_match_cursors()
+      local count = vim.v.count1
+      local visual = vim.fn.mode() ~= 'n'
+      local pos = vim.api.nvim_win_get_cursor(0)
+      if visual then
+        local anchor = vim.fn.getpos('v')
+        if
+          anchor[2] < pos[1]
+          or anchor[2] == pos[1] and anchor[3] - 1 < pos[2]
+        then
+          pos = { anchor[2], anchor[3] - 1 }
+        end
+      end
+      -- Searching for placement must not move the existing extra cursors.
+      vim.cmd.normal({ '2q=', bang = true })
+
+      -- Visual * is a nightly default mapping that searches literal text.
+      -- Restore the origin instead of using N (which fails with nowrapscan).
+      local ok, err = pcall(vim.cmd.normal, { '*', bang = not visual })
+      vim.api.nvim_win_set_cursor(0, pos)
+      if not ok then
+        vim.notify(tostring(err), vim.log.levels.WARN)
+        return
+      end
+      for _ = 1, count do
+        if not pcall(vim.cmd.normal, { '1Qn', bang = true }) then
+          break
+        end
+      end
+    end
+
+    ---Clear native cursors and leave Visual mode.
+    ---@return nil
+    local function clear_cursors()
+      vim.cmd.normal({ vim.keycode('<Esc>'), bang = true })
+      vim.api.nvim_buf_clear_namespace(
+        0,
+        vim.api.nvim_create_namespace('nvim.multicursor'),
+        0,
+        -1
+      )
+    end
+
+    -- stylua: ignore start
+    map('n', '<Leader>mj', function() add_line_cursors('j') end, { desc = 'Add cursor below' })
+    map('n', '<Leader>mk', function() add_line_cursors('k') end, { desc = 'Add cursor above' })
+    map({ 'n', 'x' }, '<Leader>mn', add_match_cursors, { desc = 'Add next word/selection matches' })
+    map({ 'n', 'x' }, '<Leader>mc', clear_cursors, { desc = 'Clear multicursors' })
+    -- stylua: ignore end
+
     -- Multi-window operations
     -- stylua: ignore start
     map({ 'x', 'n' }, '<M-w>', '<C-w>w', { desc = 'Cycle through windows' })
@@ -251,8 +315,8 @@ require('my.utils.load').on_events(
     map('i', '<C-g>=', '<C-g>u<Esc>[s1z=`]a<C-G>u', { desc = 'Correct misspelled word before cursor' })
     -- stylua: ignore end
 
-    -- Only clear highlights and message area and don't redraw if search
-    -- highlighting is on to avoid flickering
+    -- Clear cursors, highlights, and messages. Skip the full redraw while
+    -- search highlighting is on to avoid flickering.
     -- Use `:sil! dif` to suppress error
     -- 'E11: Invalid in command-line window; <CR> executes, CTRL-C quits'
     -- in command window
@@ -262,7 +326,9 @@ require('my.utils.load').on_events(
     vim.keymap.set(
       { 'n', 'x' },
       '<C-l>',
-      [['<Cmd>ec|noh|sil! dif<CR>' . (v:hlsearch ? '' : '<C-l>')]],
+      [['<Cmd>ec|noh|call nvim_buf_clear_namespace(0, ]]
+        .. [[nvim_create_namespace("nvim.multicursor"), 0, -1)]]
+        .. [[|sil! dif<CR>' . (v:hlsearch ? '' : '<C-l>')]],
       {
         expr = true,
         replace_keycodes = false,
