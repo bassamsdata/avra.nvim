@@ -80,7 +80,6 @@ do
       contents,
       syntax,
       vim.tbl_deep_extend('force', opts or {}, {
-        border = 'solid',
         max_width = math.max(80, math.ceil(vim.go.columns * 0.75)),
         max_height = math.max(20, math.ceil(vim.go.lines * 0.4)),
         close_events = {

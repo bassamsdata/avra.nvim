@@ -116,6 +116,7 @@ vim.api.nvim_create_autocmd('UIEnter', {
       height = #lines,
       relative = 'editor',
       style = 'minimal',
+      border = 'none',
       focusable = false,
       noautocmd = true,
       zindex = 1,

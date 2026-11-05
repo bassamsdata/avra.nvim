@@ -71,6 +71,7 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.completeopt = 'menuone'
 vim.opt.tabclose = 'uselast'
+vim.opt.winborder = 'rounded'
 
 -- Find recursively under current directory
 vim.opt.path:append('**')
