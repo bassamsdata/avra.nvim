@@ -212,6 +212,25 @@ require('my.utils.load').on_events(
     map('n', 'gf', 'gF', { desc = 'Go to file under cursor' })
     map('n', ']f', 'gF', { desc = 'Go to file under cursor' })
 
+    map('n', '<C-g>', function()
+      local count = vim.v.count
+      vim.cmd.normal({
+        (count > 0 and tostring(count) or '') .. vim.keycode('<C-g>'),
+        bang = true,
+      })
+
+      local path = vim.api.nvim_buf_get_name(0)
+      if path == '' then
+        return
+      end
+
+      vim.fn.setreg('"', path)
+      if vim.fn.has('clipboard') == 1 then
+        vim.fn.setreg('+', path)
+        vim.fn.setreg('*', path)
+      end
+    end, { desc = 'Show file info and copy the absolute path' })
+
     -- Delete selection in select mode
     map('s', '<BS>', '<C-o>"_s', { desc = 'Delete selection' })
     map('s', '<C-h>', '<C-o>"_s', { desc = 'Delete selection' })
